@@ -12,7 +12,7 @@
 path: ./  # dataset root dir
 train: tricoscopio/train  # train images (relative to 'path') 128 images
 val: tricoscopio/train  # val images (relative to 'path') 128 images
-test: tricoscopio/test
+test: # tricoscopio/test
 
 # Classes
 names:
