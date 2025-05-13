@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir numpy==1.24.3 && \
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 8000
+EXPOSE 7000
 
 # Set environment variable to use CPU
 ENV CUDA_VISIBLE_DEVICES=""
