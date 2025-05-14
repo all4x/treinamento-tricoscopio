@@ -10,6 +10,8 @@ from PIL import Image
 import torch
 from typing import List
 import os
+import sys
+import traceback
 
 app = FastAPI(title="Tricoscopio API")
 
@@ -23,8 +25,31 @@ app.add_middleware(
 )
 
 # Load the model at startup with CPU
-model = YOLO("bestv2.pt", task='detect')
-model.to('cpu')  # Explicitly set to CPU
+try:
+    print("Iniciando carregamento do modelo bestv2.pt...")
+    model_path = "bestv2.pt"
+    
+    # Verify model file exists
+    if not os.path.exists(model_path):
+        print(f"ERRO: Arquivo de modelo {model_path} não encontrado!")
+        sys.exit(1)
+        
+    # Check file size
+    file_size = os.path.getsize(model_path)
+    print(f"Tamanho do arquivo do modelo: {file_size} bytes")
+    
+    if file_size < 1000:  # Arquivo muito pequeno
+        print("ERRO: Arquivo de modelo parece estar corrompido (muito pequeno)")
+        sys.exit(1)
+        
+    # Load model
+    model = YOLO(model_path, task='detect')
+    model.to('cpu')  # Explicitly set to CPU
+    print("Modelo carregado com sucesso!")
+except Exception as e:
+    print(f"ERRO ao carregar o modelo: {str(e)}")
+    print(traceback.format_exc())
+    sys.exit(1)
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
@@ -63,6 +88,8 @@ async def predict(file: UploadFile = File(...)):
         })
         
     except Exception as e:
+        print(f"Erro no endpoint predict: {str(e)}")
+        print(traceback.format_exc())
         return JSONResponse({
             "success": False,
             "error": str(e)
@@ -121,6 +148,8 @@ async def detect_multiple(files: List[UploadFile] = File(...)):
         })
         
     except Exception as e:
+        print(f"Erro no endpoint detect-multiple: {str(e)}")
+        print(traceback.format_exc())
         return JSONResponse({
             "success": False,
             "error": str(e)
@@ -129,6 +158,11 @@ async def detect_multiple(files: List[UploadFile] = File(...)):
 @app.get("/")
 async def root():
     return {"message": "Welcome to Tricoscopio API. Use /predict endpoint to detect objects."}
+
+@app.get("/health")
+async def health_check():
+    """Endpoint para verificar a saúde da API."""
+    return {"status": "healthy", "model_loaded": model is not None}
 
 if __name__ == "__main__":
     import uvicorn
