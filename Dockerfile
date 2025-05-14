@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
     curl \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first to leverage Docker cache
@@ -17,14 +18,15 @@ RUN pip install --no-cache-dir numpy==1.24.3 && \
     pip install --no-cache-dir -r requirements.txt && \
     pip cache purge
 
-# Copy the application code first (without model) to leverage Docker cache
+# Copy the application code first
 COPY api_tricoscopio.py nginx.conf ./
 
-# Copy the model file separately (this is usually the largest file)
-COPY bestv2.pt ./
+# Download the model file from the file server
+RUN wget -O bestv2.pt "https://projetos-filebrowser.6lzljz.easypanel.host/api/public/dl/fhzod0pt/mobile/bestv2.pt" || \
+    curl -L -o bestv2.pt "https://projetos-filebrowser.6lzljz.easypanel.host/api/public/dl/fhzod0pt/mobile/bestv2.pt"
 
 # Verify model file exists and is valid
-RUN python -c "import os; assert os.path.exists('bestv2.pt') and os.path.getsize('bestv2.pt') > 0, 'Model file missing or empty'"
+RUN python -c "import os; assert os.path.exists('bestv2.pt') and os.path.getsize('bestv2.pt') > 1000000, 'Model file missing or too small'"
 
 # Copy any remaining files
 COPY . .

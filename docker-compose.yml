@@ -4,7 +4,6 @@ services:
   tricoscopio-api-1:
     build: .
     volumes:
-      - ./bestv2.pt:/app/bestv2.pt:ro
       - ./api_tricoscopio.py:/app/api_tricoscopio.py
     environment:
       - PYTHONUNBUFFERED=1
@@ -27,7 +26,6 @@ services:
   tricoscopio-api-2:
     build: .
     volumes:
-      - ./bestv2.pt:/app/bestv2.pt:ro
       - ./api_tricoscopio.py:/app/api_tricoscopio.py
     environment:
       - PYTHONUNBUFFERED=1
