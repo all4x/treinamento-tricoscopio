@@ -21,15 +21,24 @@ RUN pip install --no-cache-dir numpy==1.24.3 && \
 # Copy the application code first
 COPY api_tricoscopio.py nginx.conf ./
 
-# Download the model file from the file server
-RUN wget -O bestv2.pt "https://projetos-filebrowser.6lzljz.easypanel.host/api/public/dl/fhzod0pt/mobile/bestv2.pt" || \
-    curl -L -o bestv2.pt "https://projetos-filebrowser.6lzljz.easypanel.host/api/public/dl/fhzod0pt/mobile/bestv2.pt"
+# Download the model file from the file server with a different name
+RUN wget -O model_yolo_new.pt "https://projetos-filebrowser.6lzljz.easypanel.host/api/public/dl/fhzod0pt/mobile/bestv2.pt" || \
+    curl -L -o model_yolo_new.pt "https://projetos-filebrowser.6lzljz.easypanel.host/api/public/dl/fhzod0pt/mobile/bestv2.pt"
 
 # Verify model file exists and is valid
-RUN python -c "import os; assert os.path.exists('bestv2.pt') and os.path.getsize('bestv2.pt') > 1000000, 'Model file missing or too small'"
+RUN python -c "import os; assert os.path.exists('model_yolo_new.pt') and os.path.getsize('model_yolo_new.pt') > 1000000, 'Model file missing or too small'"
 
-# Copy any remaining files
-COPY . .
+# Rename the model to what the application expects
+RUN mv model_yolo_new.pt bestv2.pt
+
+# Copy any remaining files EXCEPT the model
+COPY --chown=root:root \
+     .dockerignore \
+     docker-compose.yml \
+     nginx.conf \
+     requirements.txt \
+     tricoscopio.yaml \
+     ./
 
 # Expose the port the app runs on
 EXPOSE 7000

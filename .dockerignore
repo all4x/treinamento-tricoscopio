@@ -1,5 +1,33 @@
+# Git
 .git
 .gitignore
+.github
+
+# Docker
+.docker
+
+# Python
+app/__pycache__/
+app/*/__pycache__/
+app/*/*/__pycache__/
+app/*/*/*/__pycache__/
+.env/
+.venv/
+venv/
+
+# Local PostgreSQL data
+data/
+
+# Arquivo de modelo corrompido
+bestv2.pt
+best.pt
+best-old.pt
+yolov8s.pt
+
+# Outros arquivos grandes
+*.pt
+!model_yolo_new.pt
+
 __pycache__
 *.pyc
 *.pyo
@@ -17,6 +45,4 @@ coverage.xml
 *.cover
 *.log
 .pytest_cache
-.env
-.venv
 .DS_Store 
