@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Install Python packages - ensure specific versions are used
+# Install Python packages with increased timeout
 RUN pip install --no-cache-dir numpy==1.24.3 && \
-    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir --timeout=300 -r requirements.txt && \
     pip cache purge
 
 # Copy the application code first
