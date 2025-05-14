@@ -11,12 +11,21 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Install Python packages with specific order and clean cache
+# Install Python packages - ensure specific versions are used
 RUN pip install --no-cache-dir numpy==1.24.3 && \
     pip install --no-cache-dir -r requirements.txt && \
     pip cache purge
 
-# Copy the rest of the application
+# Copy the application code first (without model) to leverage Docker cache
+COPY api_tricoscopio.py nginx.conf ./
+
+# Copy the model file separately (this is usually the largest file)
+COPY bestv2.pt ./
+
+# Verify model file exists and is valid
+RUN python -c "import os; assert os.path.exists('bestv2.pt') and os.path.getsize('bestv2.pt') > 0, 'Model file missing or empty'"
+
+# Copy any remaining files
 COPY . .
 
 # Expose the port the app runs on
