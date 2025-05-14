@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # Load the model at startup with CPU
-model = YOLO("best.pt", task='detect')
+model = YOLO("bestv2.pt", task='detect')
 model.to('cpu')  # Explicitly set to CPU
 
 @app.post("/predict")
